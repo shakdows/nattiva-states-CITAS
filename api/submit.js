@@ -4,7 +4,23 @@ const SPREADSHEET_ID = "1KY0cjwuv71ycvWOtHuGAiQWhA_km6x5Z";
 const SHEET_NAME = "Citas Nattiva States";
 
 function getAuth() {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  let raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!raw) throw new Error("ENV_MISSING: GOOGLE_SERVICE_ACCOUNT_JSON no definida");
+
+  raw = raw.trim().replace(/^\uFEFF/, "");
+
+  let credentials;
+  try {
+    credentials = JSON.parse(raw);
+  } catch (e) {
+    throw new Error("ENV_JSON_PARSE_ERROR: " + e.message + " | starts_with: " + raw.substring(0, 80));
+  }
+
+  // Fix private_key newlines if double-escaped
+  if (credentials.private_key) {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+  }
+
   return new google.auth.GoogleAuth({
     credentials,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -60,7 +76,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ success: true, message: "Cita registrada correctamente" });
   } catch (err) {
-    console.error("Error al guardar en Sheets:", err);
+    console.error("Error al guardar en Sheets:", err.message);
     return res.status(500).json({ error: "Error al guardar en Google Sheets", detail: err.message });
   }
 };
