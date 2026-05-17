@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 
-const SPREADSHEET_ID = "1KY0cjwuv71ycvWOtHuGAiQWhA_km6x5Z";
+const SPREADSHEET_ID = "1YpBJWYbRKDVLgDIgYAeAVIVulN0sjlwZQ3qRL5OuH5M";
 const SHEET_NAME = "Citas Nattiva States";
 
 function getAuth() {
