@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
 
     // Try to read the sheet
     const result = await sheets.spreadsheets.get({
-      spreadsheetId: "1KY0cjwuv71ycvWOtHuGAiQWhA_km6x5Z",
+      spreadsheetId: "1YpBJWYbRKDVLgDIgYAeAVIVulN0sjlwZQ3qRL5OuH5M",
     });
 
     return res.status(200).json({
