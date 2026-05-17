@@ -1,0 +1,11 @@
+{
+  "name": "nattiva-states",
+  "version": "1.0.0",
+  "description": "Formulario de citas inmobiliarias Nattiva States",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "googleapis": "^144.0.0"
+  }
+}

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solicitar Cita · Nattiva States</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy: #1A2B4A;
+    --gold: #C9A84C;
+    --gold-light: #E8C87A;
+    --cream: #F9F6F0;
+    --warm-gray: #E8E4DC;
+    --text: #2C2C2C;
+    --text-light: #7A7068;
+    --white: #FFFFFF;
+    --error: #C0392B;
+    --success: #1A6B4A;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(201,168,76,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 5% 80%, rgba(26,43,74,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .brand-header { text-align: center; margin-bottom: 48px; }
+
+  .brand-logo {
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  }
+
+  .logo-icon {
+    width: 44px; height: 44px; background: var(--navy); border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 500; color: var(--navy); letter-spacing: 0.04em;
+  }
+
+  .brand-name span { color: var(--gold); font-weight: 300; }
+
+  .divider-gold {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 16px auto;
+  }
+
+  .brand-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 300; color: var(--text-light); letter-spacing: 0.08em;
+  }
+
+  .form-card {
+    background: var(--white);
+    border: 1px solid var(--warm-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(26,43,74,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  }
+
+  .form-card-header {
+    background: var(--navy); padding: 28px 36px;
+    display: flex; align-items: center; gap: 16px;
+  }
+
+  .form-card-header .icon {
+    width: 40px; height: 40px;
+    background: rgba(201,168,76,0.15);
+    border-radius: 8px; border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .form-card-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 500; color: var(--white); letter-spacing: 0.03em;
+  }
+
+  .form-card-header p { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 3px; letter-spacing: 0.04em; }
+
+  form { padding: 36px; }
+
+  .section-label {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px; margin-top: 32px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
+  .section-label span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 500; color: var(--navy);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--warm-gray); }
+
+  .section-num {
+    width: 24px; height: 24px; background: var(--gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; color: var(--navy); flex-shrink: 0;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-1 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .col-span-2 { grid-column: span 2; }
+
+  @media (max-width: 580px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .col-span-2 { grid-column: span 1; }
+    form { padding: 24px; }
+    .form-card-header { padding: 20px 24px; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 11.5px; font-weight: 500; color: var(--text-light);
+    letter-spacing: 0.07em; text-transform: uppercase;
+  }
+  label .req { color: var(--gold); margin-left: 2px; }
+
+  input[type="text"], input[type="email"], input[type="tel"],
+  input[type="number"], select {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--warm-gray); border-radius: 7px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--white); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  }
+
+  input::placeholder { color: #BCBCBC; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    padding-right: 36px; cursor: pointer;
+  }
+
+  .radio-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+
+  .radio-pill input[type="radio"] { display: none; }
+
+  .radio-pill label {
+    display: block; padding: 9px 18px;
+    border: 1px solid var(--warm-gray); border-radius: 40px;
+    font-size: 13px; font-weight: 400; color: var(--text-light);
+    letter-spacing: 0; text-transform: none;
+    cursor: pointer; transition: all 0.18s; background: var(--white); user-select: none;
+  }
+
+  .radio-pill input:checked + label {
+    background: var(--navy); border-color: var(--navy);
+    color: var(--white); box-shadow: 0 2px 8px rgba(26,43,74,0.2);
+  }
+
+  .radio-pill label:hover { border-color: var(--gold); color: var(--navy); }
+
+  .amount-wrap { position: relative; }
+  .amount-wrap .prefix {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 13px; font-weight: 500; color: var(--text-light); pointer-events: none;
+  }
+  .amount-wrap input { padding-left: 36px; }
+
+  .submit-area {
+    margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--warm-gray);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  .submit-note { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+
+  .btn-submit {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 13px 28px; background: var(--navy); color: var(--white);
+    border: none; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 12px rgba(26,43,74,0.25); white-space: nowrap;
+  }
+
+  .btn-submit:hover:not(:disabled) {
+    background: #253D6B; box-shadow: 0 4px 20px rgba(26,43,74,0.35); transform: translateY(-1px);
+  }
+
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-submit svg { width: 16px; height: 16px; }
+
+  /* Spinner */
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Banners */
+  .banner {
+    display: none; border-radius: 10px; padding: 18px 22px;
+    margin-bottom: 24px; align-items: center; gap: 14px;
+  }
+  .banner.show { display: flex; }
+
+  .banner-success { background: linear-gradient(135deg, #1A6B4A, #0E4A33); color: white; }
+  .banner-error   { background: linear-gradient(135deg, #C0392B, #922B21); color: white; }
+
+  .banner .bicon {
+    width: 38px; height: 38px; background: rgba(255,255,255,0.15);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .banner h3 { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .banner p  { font-size: 12px; opacity: 0.85; }
+
+  .field-hint { font-size: 11px; color: var(--text-light); margin-top: 2px; font-style: italic; }
+
+  /* Counter */
+  .record-counter {
+    display: none; align-items: center; gap: 8px;
+    padding: 10px 16px; background: rgba(26,43,74,0.05);
+    border-radius: 8px; font-size: 12px; color: var(--text-light); margin-bottom: 24px;
+  }
+  .record-counter.show { display: flex; }
+  .record-counter strong { color: var(--navy); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Brand -->
+  <div class="brand-header">
+    <div class="brand-logo">
+      <div class="logo-icon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M13 2L3 9V23H10V16H16V23H23V9L13 2Z" stroke="#C9A84C" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="brand-name">NATTIVA <span>STATES</span></div>
+    </div>
+    <div class="divider-gold"></div>
+    <div class="brand-tagline">Solicitud de Asesoría Inmobiliaria</div>
+  </div>
+
+  <!-- Counter -->
+  <div class="record-counter" id="counterBar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <span><strong id="recordCount">0</strong> citas guardadas en Google Sheets hoy</span>
+  </div>
+
+  <!-- Success banner -->
+  <div class="banner banner-success" id="bannerSuccess">
+    <div class="bicon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div>
+      <h3>¡Cita registrada en Google Sheets!</h3>
+      <p>Los datos se guardaron correctamente. Puedes continuar con otra solicitud.</p>
+    </div>
+  </div>
+
+  <!-- Error banner -->
+  <div class="banner banner-error" id="bannerError">
+    <div class="bicon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div>
+      <h3>Error al guardar</h3>
+      <p id="errorMsg">Ocurrió un problema. Por favor intenta nuevamente.</p>
+    </div>
+  </div>
+
+  <!-- Form card -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.8">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Formulario de Cita</h1>
+        <p>Complete los datos del cliente · Los registros se guardan directamente en Google Sheets</p>
+      </div>
+    </div>
+
+    <form id="citaForm" novalidate>
+
+      <!-- Sección 1 -->
+      <div class="section-label">
+        <div class="section-num">1</div>
+        <span>Datos Personales</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field col-span-2">
+          <label>Nombre Completo <span class="req">*</span></label>
+          <input type="text" id="nombre" placeholder="Nombre y apellidos" required/>
+        </div>
+        <div class="field">
+          <label>DNI <span class="req">*</span></label>
+          <input type="text" id="dni" placeholder="12345678" maxlength="8" required/>
+        </div>
+        <div class="field">
+          <label>Estado Civil</label>
+          <select id="estadoCivil">
+            <option value="">Seleccionar...</option>
+            <option>Soltero/a</option>
+            <option>Casado/a</option>
+            <option>Conviviente</option>
+            <option>Divorciado/a</option>
+            <option>Viudo/a</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Correo Electrónico <span class="req">*</span></label>
+          <input type="email" id="correo" placeholder="correo@ejemplo.com" required/>
+        </div>
+        <div class="field">
+          <label>Teléfono / Celular <span class="req">*</span></label>
+          <input type="tel" id="telefono" placeholder="987 654 321" required/>
+        </div>
+      </div>
+
+      <!-- Sección 2 -->
+      <div class="section-label">
+        <div class="section-num">2</div>
+        <span>Perfil de Compra</span>
+      </div>
+
+      <div class="grid-1">
+        <div class="field">
+          <label>¿Es tu primera vivienda?</label>
+          <div class="radio-group">
+            <div class="radio-pill"><input type="radio" name="primeraViv" id="pv1" value="Sí, es mi primera vivienda"/><label for="pv1">Sí, es mi primera vivienda</label></div>
+            <div class="radio-pill"><input type="radio" name="primeraViv" id="pv2" value="No, ya tengo vivienda"/><label for="pv2">No, ya tengo vivienda</label></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Propósito de la compra</label>
+          <div class="radio-group">
+            <div class="radio-pill"><input type="radio" name="proposito" id="pr1" value="Para vivir"/><label for="pr1">Para vivir</label></div>
+            <div class="radio-pill"><input type="radio" name="proposito" id="pr2" value="Para invertir"/><label for="pr2">Para invertir</label></div>
+            <div class="radio-pill"><input type="radio" name="proposito" id="pr3" value="Ambos"/><label for="pr3">Ambos</label></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tipo de financiamiento</label>
+          <div class="radio-group">
+            <div class="radio-pill"><input type="radio" name="financ" id="fc1" value="Crédito hipotecario aprobado"/><label for="fc1">Crédito hipotecario aprobado</label></div>
+            <div class="radio-pill"><input type="radio" name="financ" id="fc2" value="Al contado (Cash)"/><label for="fc2">Al contado (Cash)</label></div>
+            <div class="radio-pill"><input type="radio" name="financ" id="fc3" value="Sin crédito aún (evaluando)"/><label for="fc3">Sin crédito aún</label></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3 -->
+      <div class="section-label">
+        <div class="section-num">3</div>
+        <span>Capacidad Financiera</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Cuota inicial disponible</label>
+          <div class="amount-wrap">
+            <span class="prefix">S/</span>
+            <input type="number" id="inicial" placeholder="0" min="0"/>
+          </div>
+          <span class="field-hint">Indique su inicial disponible (con o sin crédito)</span>
+        </div>
+        <div class="field">
+          <label>Presupuesto total</label>
+          <div class="amount-wrap">
+            <span class="prefix">S/</span>
+            <input type="number" id="presupuesto" placeholder="0" min="0"/>
+          </div>
+        </div>
+        <div class="field col-span-2">
+          <label>Cuota mensual aproximada que consideraría pagar</label>
+          <div class="amount-wrap">
+            <span class="prefix">S/</span>
+            <input type="number" id="cuota" placeholder="0" min="0"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 4 -->
+      <div class="section-label">
+        <div class="section-num">4</div>
+        <span>Preferencias del Inmueble</span>
+      </div>
+
+      <div class="grid-1">
+        <div class="field">
+          <label>Distrito de preferencia</label>
+          <select id="distrito">
+            <option value="">Seleccionar distrito...</option>
+            <optgroup label="Lima Moderna">
+              <option>Miraflores</option><option>San Isidro</option><option>Barranco</option>
+              <option>Surco</option><option>La Molina</option><option>San Borja</option>
+              <option>Jesús María</option><option>Lince</option><option>Magdalena del Mar</option>
+              <option>Pueblo Libre</option><option>San Miguel</option>
+            </optgroup>
+            <optgroup label="Lima Norte">
+              <option>Los Olivos</option><option>Independencia</option><option>Comas</option>
+              <option>San Martín de Porres</option>
+            </optgroup>
+            <optgroup label="Lima Sur">
+              <option>Chorrillos</option><option>Villa El Salvador</option><option>Lurín</option>
+            </optgroup>
+            <optgroup label="Lima Este">
+              <option>San Juan de Lurigancho</option><option>Ate</option><option>El Agustino</option>
+            </optgroup>
+            <option value="Otro / A definir">Otro / A definir</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-area">
+        <div class="submit-note">
+          Los campos con <span style="color:var(--gold)">*</span> son obligatorios.<br/>
+          Los datos se guardan directamente en Google Sheets.
+        </div>
+        <button type="button" class="btn-submit" id="btnSubmit" onclick="submitForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Guardar Cita
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<script>
+  let totalSaved = 0;
+
+  function getRadio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+  }
+
+  function showBanner(type, msg) {
+    document.getElementById('bannerSuccess').classList.remove('show');
+    document.getElementById('bannerError').classList.remove('show');
+    if (type === 'success') {
+      document.getElementById('bannerSuccess').classList.add('show');
+      setTimeout(() => document.getElementById('bannerSuccess').classList.remove('show'), 5000);
+    } else {
+      document.getElementById('errorMsg').textContent = msg || 'Error desconocido.';
+      document.getElementById('bannerError').classList.add('show');
+      setTimeout(() => document.getElementById('bannerError').classList.remove('show'), 6000);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function submitForm() {
+    // Validation
+    const required = [
+      { id: 'nombre', label: 'Nombre' },
+      { id: 'dni', label: 'DNI' },
+      { id: 'correo', label: 'Correo' },
+      { id: 'telefono', label: 'Teléfono' },
+    ];
+
+    let valid = true;
+    required.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) {
+        el.style.borderColor = 'var(--error)';
+        el.addEventListener('input', () => el.style.borderColor = '', { once: true });
+        valid = false;
+      }
+    });
+
+    if (!valid) {
+      showBanner('error', 'Por favor completa los campos obligatorios: Nombre, DNI, Correo y Teléfono.');
+      return;
+    }
+
+    // Loading state
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Guardando...';
+
+    const payload = {
+      nombre:          document.getElementById('nombre').value.trim(),
+      dni:             document.getElementById('dni').value.trim(),
+      correo:          document.getElementById('correo').value.trim(),
+      telefono:        document.getElementById('telefono').value.trim(),
+      estadoCivil:     document.getElementById('estadoCivil').value,
+      primeraVivienda: getRadio('primeraViv'),
+      proposito:       getRadio('proposito'),
+      financiamiento:  getRadio('financ'),
+      inicial:         document.getElementById('inicial').value,
+      presupuesto:     document.getElementById('presupuesto').value,
+      distrito:        document.getElementById('distrito').value,
+      cuota:           document.getElementById('cuota').value,
+    };
+
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        totalSaved++;
+        document.getElementById('recordCount').textContent = totalSaved;
+        document.getElementById('counterBar').classList.add('show');
+        showBanner('success');
+        document.getElementById('citaForm').reset();
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      } else {
+        showBanner('error', data.error || 'Error al guardar en Google Sheets.');
+      }
+    } catch (err) {
+      showBanner('error', 'No se pudo conectar con el servidor. Verifica tu conexión.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Guardar Cita`;
+    }
+  }
+</script>
+</body>
+</html>
