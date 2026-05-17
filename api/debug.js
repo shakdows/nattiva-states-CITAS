@@ -1,37 +1,39 @@
+const { google } = require("googleapis");
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  
-  if (!raw) {
-    return res.status(200).json({ 
-      status: "ERROR", 
-      problem: "Variable GOOGLE_SERVICE_ACCOUNT_JSON no existe" 
-    });
-  }
 
-  const trimmed = raw.trim();
-  
-  let parsed;
   try {
-    parsed = JSON.parse(trimmed);
-  } catch(e) {
+    const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON.trim();
+    const credentials = JSON.parse(raw);
+    if (credentials.private_key) {
+      credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+    }
+
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Try to read the sheet
+    const result = await sheets.spreadsheets.get({
+      spreadsheetId: "1KY0cjwuv71ycvWOtHuGAiQWhA_km6x5Z",
+    });
+
+    return res.status(200).json({
+      status: "CONEXION OK",
+      sheet_title: result.data.properties.title,
+      sheets: result.data.sheets.map(s => s.properties.title),
+    });
+
+  } catch (err) {
     return res.status(200).json({
       status: "ERROR",
-      problem: "JSON inválido: " + e.message,
-      starts_with: trimmed.substring(0, 100),
-      ends_with: trimmed.substring(trimmed.length - 50),
-      length: trimmed.length
+      message: err.message,
+      code: err.code,
+      errors: err.errors || null,
     });
   }
-
-  return res.status(200).json({
-    status: "OK",
-    type: parsed.type,
-    project_id: parsed.project_id,
-    client_email: parsed.client_email,
-    has_private_key: !!parsed.private_key,
-    private_key_starts: parsed.private_key ? parsed.private_key.substring(0, 40) : "MISSING",
-    length: trimmed.length
-  });
 };
